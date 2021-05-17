@@ -27,7 +27,7 @@ $VM = New-VM @VMParams
 <# inspect #> Get-VM
 
 
-## Fix the Switche ##############################
+## Fix the Switch ##############################
 ##
 # Remove the default created switch
 Remove-VMNetworkAdapter -VMName $VMName -Name 'Network Adapter'
@@ -55,7 +55,6 @@ Add-VMDvdDrive -VMName $VMName -Path $OSiso
 
 ## Disable SecureBoot ###########################
 ##
-<# inspect #> Get-VMFirmware -VMName $VMName | select SecureBoot
 # As this is a Centos build we have to disable secureboot
 Set-VMFirmware $VMName -EnableSecureBoot Off
 # Undo: Set-VMFirmware $VMName -EnableSecureBoot On
@@ -97,6 +96,12 @@ Start-VM -Name $VMName
 #    Licensing
 #    Power off
 ##
+
+While ((get-VM -Name $VMName).State -ne 'Off' ){
+    "VM $VMName is still running. Sleeping until it's off... " + (Get-Date -Format "yyyyMMddHHmmss")
+    sleep -Seconds 10
+}
+
 <# if needed #> Stop-VM -Name $VMName -force
 
 ## Unmount OS install iso
